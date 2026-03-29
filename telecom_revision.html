@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Télécom 2 — Plateforme de Révision</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1f2937;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --cyan: #58d4e0;
+  --cyan-dim: #2a6b72;
+  --amber: #f0a93a;
+  --amber-dim: #6b4a1a;
+  --green: #56d364;
+  --green-dim: #1a4a21;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --sidebar-w: 260px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  font-size: 15px;
+}
+
+/* ─── SIDEBAR ─── */
+#sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo h1 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--cyan);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sidebar-logo p {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.sidebar-module {
+  padding: 12px 16px 6px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.nav-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 0;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  text-decoration: none;
+  color: var(--text2);
+}
+
+.nav-item:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.nav-item.active {
+  border-left-color: var(--cyan);
+  background: rgba(88,212,224,0.06);
+  color: var(--text);
+}
+
+.nav-item .nav-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  min-width: 22px;
+  padding-top: 1px;
+}
+
+.nav-item .nav-label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.nav-item .nav-sub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ─── MAIN CONTENT ─── */
+#main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+}
+
+.chapter-page {
+  display: none;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.chapter-page.active {
+  display: block;
+}
+
+/* ─── TOP BAR ─── */
+.chapter-header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.chapter-header .ch-info h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chapter-header .ch-info .ch-tag {
+  display: inline-block;
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border: 1px solid var(--cyan-dim);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.tab-switcher {
+  display: flex;
+  gap: 4px;
+  background: var(--bg3);
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.tab-btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.tab-btn:hover { color: var(--text); }
+
+.tab-btn.active {
+  background: var(--bg2);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* ─── CONTENT AREA ─── */
+.content-wrap {
+  padding: 36px 40px 60px;
+  max-width: 960px;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ─── TYPOG ─── */
+h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 32px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+h3::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 20px;
+  background: var(--cyan);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--amber);
+  margin: 20px 0 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+p {
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+em {
+  color: var(--purple);
+  font-style: normal;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.92em;
+  background: rgba(188,140,255,0.08);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 16px 0;
+}
+
+.card-key {
+  border-left: 3px solid var(--cyan);
+  background: rgba(88,212,224,0.04);
+}
+
+.card-formula {
+  border-left: 3px solid var(--amber);
+  background: rgba(240,169,58,0.04);
+}
+
+.card-warning {
+  border-left: 3px solid var(--red);
+  background: rgba(248,81,73,0.06);
+}
+
+.card-tip {
+  border-left: 3px solid var(--green);
+  background: rgba(86,211,100,0.04);
+}
+
+.card-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: 'IBM Plex Mono', monospace;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.card-key .card-label { color: var(--cyan); }
+.card-formula .card-label { color: var(--amber); }
+.card-warning .card-label { color: var(--red); }
+.card-tip .card-label { color: var(--green); }
+
+/* ─── FORMULAS ─── */
+.formula {
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin: 10px 0;
+  font-size: 14px;
+  color: var(--amber);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.formula .comment {
+  color: var(--text3);
+  font-size: 12px;
+}
+
+/* ─── TABLE ─── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+th {
+  background: var(--bg3);
+  color: var(--cyan);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+td {
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: top;
+}
+
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ─── EXERCISES ─── */
+.exercise {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 24px 0;
+  overflow: hidden;
+}
+
+.exercise-header {
+  background: var(--bg3);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.exercise-header:hover { background: rgba(255,255,255,0.04); }
+
+.exercise-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  background: rgba(88,212,224,0.1);
+  border: 1px solid var(--cyan-dim);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+
+.exercise-title {
+  font-weight: 600;
+  font-size: 14px;
+  flex: 1;
+}
+
+.exercise-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+.badge-td { background: rgba(88,212,224,0.1); color: var(--cyan); border: 1px solid var(--cyan-dim); }
+.badge-bonus { background: rgba(240,169,58,0.1); color: var(--amber); border: 1px solid var(--amber-dim); }
+
+.exercise-body {
+  padding: 20px 24px;
+  background: var(--bg2);
+}
+
+.question {
+  background: var(--bg3);
+  border-radius: 7px;
+  padding: 14px 18px;
+  margin: 12px 0;
+  font-size: 14px;
+  color: var(--text2);
+  border-left: 2px solid var(--border);
+  line-height: 1.6;
+}
+
+.question strong {
+  color: var(--cyan);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ─── CORRECTION ─── */
+.correction-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+
+.correction-toggle:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.correction-toggle.open {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--green-dim);
+}
+
+.correction-panel {
+  display: none;
+  margin-top: 14px;
+  background: rgba(86,211,100,0.03);
+  border: 1px solid rgba(86,211,100,0.2);
+  border-radius: 8px;
+  padding: 20px 22px;
+}
+
+.correction-panel.open { display: block; }
+
+.correction-panel h5 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--green);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-bottom: 12px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  margin: 10px 0;
+  align-items: flex-start;
+}
+
+.step-num {
+  min-width: 24px;
+  height: 24px;
+  background: var(--green-dim);
+  color: var(--green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-body {
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.65;
+  flex: 1;
+}
+
+.step-body .result {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--green);
+  font-size: 13px;
+  background: rgba(86,211,100,0.06);
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+/* ─── SVG DIAGRAMS ─── */
+.diagram-wrap {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.diagram-caption {
+  font-size: 12px;
+  color: var(--text3);
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
+  font-family: 'Crimson Pro', serif;
+}
+
+svg text { font-family: 'IBM Plex Mono', monospace; }
+
+/* ─── GRID ─── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+@media (max-width: 700px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  #sidebar { transform: translateX(-100%); }
+  #main { margin-left: 0; }
+  .content-wrap { padding: 20px; }
+  .chapter-header { padding: 16px 20px; }
+}
+
+/* ─── PILL TAGS ─── */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--bg3);
+  color: var(--text3);
+  border: 1px solid var(--border);
+}
+
+/* ─── HERO ─── */
+.hero {
+  background: linear-gradient(135deg, rgba(88,212,224,0.06) 0%, rgba(240,169,58,0.04) 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 30px;
+  margin-bottom: 28px;
+}
+
+.hero h3 { margin-top: 0; font-size: 22px; }
+.hero h3::before { height: 24px; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ─── WELCOME ─── */
+#page-home { display: block; }
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+.home-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.home-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(88,212,224,0.04));
+  opacity: 0;
+  transition: 0.2s;
+}
+.home-card:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.home-card:hover::after { opacity: 1; }
+.home-card .hc-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  font-weight: 600;
+  color: rgba(88,212,224,0.25);
+  position: absolute;
+  top: 14px;
+  right: 20px;
+}
+.home-card h4 {
+  color: var(--cyan);
+  font-size: 12px;
+  margin-bottom: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.home-card h3 {
+  font-size: 15px;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+.home-card h3::before { display: none; }
+.home-card p {
+  font-size: 12px;
+  color: var(--text3);
+  margin: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <h1>R205 · Télécom 2</h1>
+    <p>Plateforme de révision · 2024-25</p>
+  </div>
+  
+  <div class="sidebar-module">Navigation</div>
+  
+  <a class="nav-item active" onclick="showPage('home')" href="#">
+    <span class="nav-num">⌂</span>
+    <div>
+      <div class="nav-label">Accueil</div>
+      <div class="nav-sub">Vue d'ensemble</div>
+    </div>
+  </a>
+  
+  <div class="sidebar-module">Chapitres</div>
+  
+  <a class="nav-item" onclick="showPage('ch1')" href="#">
+    <span class="nav-num">01</span>
+    <div>
+      <div class="nav-label">Présentation</div>
+      <div class="nav-sub">Hypsogramme · Bilan liaison</div>
+    </div>
+  </a>
+  
+  <a class="nav-item" onclick="showPage('ch2')" href="#">
+    <span class="nav-num">02</span>
+    <div>
+      <div class="nav-label">Temps & Fréquence</div>
+      <div class="nav-sub">Fourier · Spectres · Parseval</div>
+    </div>
+  </a>
+  
+  <a class="nav-item" onclick="showPage('ch3')" href="#">
+    <span class="nav-num">03</span>
+    <div>
+      <div class="nav-label">Analyse Spectrale</div>
+      <div class="nav-sub">Analyseur · RBW · DSP · THD</div>
+    </div>
+  </a>
+  
+  <a class="nav-item" onclick="showPage('ch4')" href="#">
+    <span class="nav-num">04</span>
+    <div>
+      <div class="nav-label">Les Filtres</div>
+      <div class="nav-sub">Gabarits · Bode · Sélectivité</div>
+    </div>
+  </a>
+</nav>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<main id="main">
+
+<!-- ─── HOME ─── -->
+<div id="page-home" class="chapter-page active">
+  <div class="chapter-header">
+    <div class="ch-info">
+      <div class="ch-tag">R205 · Signaux et systèmes pour les transmissions</div>
+      <h2>Plateforme de Révision — Télécom 2</h2>
+    </div>
+  </div>
+  <div class="content-wrap">
+    <div class="hero">
+      <h3>Bienvenue sur votre espace de révision 👋</h3>
+      <p>Cette plateforme couvre l'intégralité du module <strong>R205 — Signaux et systèmes pour les transmissions</strong>. Pour chaque chapitre, retrouvez une fiche de révision synthétique et des exercices corrigés tirés des TDs.</p>
+      <div class="tags">
+        <span class="tag">4 chapitres</span>
+        <span class="tag">6 TDs</span>
+        <span class="tag">Corrections détaillées</span>
+        <span class="tag">Exercices bonus</span>
+        <span class="tag">Schémas SVG</span>
+      </div>
+    </div>
+
+    <div class="home-grid">
+      <div class="home-card" onclick="showPage('ch1')">
+        <span class="hc-num">01</span>
+        <h4>Chapitre 1</h4>
+        <h3>Présentation des systèmes</h3>
+        <p>Bilan de liaison, hypsogramme, marge et budget de liaison, sensibilité récepteur</p>
+      </div>
+      <div class="home-card" onclick="showPage('ch2')">
+        <span class="hc-num">02</span>
+        <h4>Chapitre 2</h4>
+        <h3>Représentations T & F</h3>
+        <p>Signaux sinusoïdaux, carrés, numériques, Décomposition en Série de Fourier, Parseval</p>
+      </div>
+      <div class="home-card" onclick="showPage('ch3')">
+        <span class="hc-num">03</span>
+        <h4>Chapitre 3</h4>
+        <h3>Analyse Spectrale</h3>
+        <p>Analyseur de spectres, RBW, VBW, Densité Spectrale de Puissance, Taux de Distorsion</p>
+      </div>
+      <div class="home-card" onclick="showPage('ch4')">
+        <span class="hc-num">04</span>
+        <h4>Chapitre 4</h4>
+        <h3>Les Filtres</h3>
+        <p>Types de filtres, gabarits, diagramme de Bode, facteur de qualité, filtre RLC</p>
+      </div>
+    </div>
+
+    <div class="card card-tip">
+      <div class="card-label">💡 Conseil de révision</div>
+      <p style="margin:0;">Commencez par lire la fiche de cours d'un chapitre, puis tentez les exercices <strong>avant</strong> d'afficher les corrections. Utilisez les boutons <strong style="color:var(--green)">▶ Voir la correction</strong> uniquement après avoir essayé !</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CHAPITRE 1 ─── -->
+<div id="page-ch1" class="chapter-page">
+  <div class="chapter-header">
+    <div class="ch-info">
+      <div class="ch-tag">Chapitre 1</div>
+      <h2>Présentation des systèmes de transmission</h2>
+    </div>
+    <div class="tab-switcher">
+      <button class="tab-btn active" onclick="switchTab(this,'ch1','cours')">📖 Cours</button>
+      <button class="tab-btn" onclick="switchTab(this,'ch1','exos')">✏️ Exercices</button>
+    </div>
+  </div>
+
+  <div class="content-wrap">
+    <!-- COURS -->
+    <div id="ch1-cours" class="tab-content active">
+      <h3>I — Système de transmission</h3>
+      <p>Un système de transmission relie un <strong>émetteur</strong> à un <strong>récepteur</strong> à travers un <strong>canal</strong>. La chaîne comprend : capteur → CAN → codage → modulation → <em>canal</em> → démodulation → décodage → CNA.</p>
+
+      <h3>II — Notions fondamentales</h3>
+      <div class="grid-2">
+        <div class="card card-key">
+          <div class="card-label">Atténuation</div>
+          <p>Rapport entre la puissance d'émission et la puissance reçue.</p>
+          <div class="formula">Att = Pₑ(W) / Pₛ(W)
+Att(dB) = Pₑ(dBm) − Pₛ(dBm)</div>
+        </div>
+        <div class="card card-key">
+          <div class="card-label">Gain (Amplificateur)</div>
+          <p>Rapport entre la puissance (ou tension) de sortie et d'entrée.</p>
+          <div class="formula">Gₚ(dB) = 10·log(Pₛ/Pₑ)
+Gᵥ(dB) = 20·log(Vₛ/Vₑ)</div>
+        </div>
+      </div>
+
+      <div class="card card-formula">
+        <div class="card-label">Bilan de liaison simplifié</div>
+        <div class="formula">Pₛ(dBm) = Pₑ(dBm) − Att(dB)</div>
+        <p style="margin-top:8px; margin-bottom:0;">Dans un hypsogramme : on <strong>additionne les gains</strong> et on <strong>soustrait les pertes</strong> le long de la chaîne.</p>
+      </div>
+
+      <h3>III — L'Hypsogramme</h3>
+      <p>Représentation graphique des <strong>variations de puissance</strong> (en dBm) aux différents points d'une chaîne de transmission.</p>
+
+      <!-- SVG Hypsogramme -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:780px;display:block;margin:auto;">
+          <defs>
+            <marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#58d4e0"/>
+            </marker>
+          </defs>
+          <!-- Baseline -->
+          <line x1="30" y1="110" x2="750" y2="110" stroke="#30363d" stroke-width="1" stroke-dasharray="4,4"/>
+          <!-- Nodes -->
+          <!-- Emetteur -->
+          <rect x="30" y="80" width="80" height="30" rx="5" fill="#1f2937" stroke="#58d4e0" stroke-width="1.5"/>
+          <text x="70" y="100" text-anchor="middle" fill="#58d4e0" font-size="11">Émetteur</text>
+          <!-- Point Pe = +10dBm -->
+          <circle cx="140" cy="70" r="5" fill="#f0a93a"/>
+          <text x="140" y="58" text-anchor="middle" fill="#f0a93a" font-size="11">+10 dBm</text>
+          <!-- Cable -2dB -->
+          <line x1="145" y1="70" x2="210" y2="85" stroke="#58d4e0" stroke-width="2" marker-end="url(#arrowR)"/>
+          <text x="178" y="68" text-anchor="middle" fill="#6e7681" font-size="10">−2 dB</text>
+          <!-- Antenne Tx -->
+          <rect x="215" y="75" width="75" height="25" rx="5" fill="#1f2937" stroke="#30363d" stroke-width="1"/>
+          <text x="252" y="91" text-anchor="middle" fill="#8b949e" font-size="10">Ant. +7dB</text>
+          <!-- Canal -80dB -->
+          <line x1="290" y1="82" x2="430" y2="128" stroke="#f85149" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowR)"/>
+          <text x="360" y="98" text-anchor="middle" fill="#f85149" font-size="10">Canal −80 dB</text>
+          <!-- Antenne Rx -->
+          <rect x="435" y="118" width="75" height="25" rx="5" fill="#1f2937" stroke="#30363d" stroke-width="1"/>
+          <text x="472" y="134" text-anchor="middle" fill="#8b949e" font-size="10">Ant. +7dB</text>
+          <!-- Ampli satellite -->
+          <rect x="435" y="78" width="75" height="25" rx="5" fill="#1f3340" stroke="#58d4e0" stroke-width="1"/>
+          <text x="472" y="94" text-anchor="middle" fill="#58d4e0" font-size="10">Ampli +60dB</text>
+          <line x1="472" y1="118" x2="472" y2="103" stroke="#58d4e0" stroke-width="1.5" marker-end="url(#arrowR)"/>
+          <!-- Cable Rx -->
+          <line x1="510" y1="130" x2="580" y2="140" stroke="#58d4e0" stroke-width="2" marker-end="url(#arrowR)"/>
+          <text x="545" y="128" text-anchor="middle" fill="#6e7681" font-size="10">−2 dB</text>
+          <!-- Récepteur -->
+          <rect x="590" y="128" width="80" height="28" rx="5" fill="#1f2937" stroke="#30363d" stroke-width="1.5"/>
+          <text x="630" y="146" text-anchor="middle" fill="#8b949e" font-size="11">Récepteur</text>
+          <!-- Sensibilité -->
+          <line x1="590" y1="168" x2="670" y2="168" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="680" y="172" fill="#f85149" font-size="10">Sᵣ</text>
+          <!-- Ps final -->
+          <circle cx="585" cy="142" r="5" fill="#56d364"/>
+          <text x="570" y="162" text-anchor="middle" fill="#56d364" font-size="11">−65 dBm</text>
+          <!-- Marge -->
+          <line x1="630" y1="142" x2="630" y2="168" stroke="#56d364" stroke-width="1.5" marker-end="url(#arrowR)"/>
+          <text x="645" y="157" fill="#56d364" font-size="10">Marge</text>
+          <!-- Title -->
+          <text x="390" y="210" text-anchor="middle" fill="#6e7681" font-size="11">Hypsogramme simplifié — liaison satellite</text>
+        </svg>
+        <div class="diagram-caption">Figure 1 — Hypsogramme : les puissances évoluent le long de la chaîne (gains = ↑, pertes = ↓)</div>
+      </div>
+
+      <h3>IV — Exploitation de l'hypsogramme</h3>
+      <div class="grid-2">
+        <div class="card card-key">
+          <div class="card-label">Sensibilité (Seuil) récepteur Sᵣ</div>
+          <p>Puissance <strong>minimale</strong> à fournir en entrée du récepteur pour qu'il fonctionne correctement. Exprimée en dBm.</p>
+        </div>
+        <div class="card card-key">
+          <div class="card-label">Marge de liaison M</div>
+          <div class="formula">M(dB) = Pᵣ(dBm) − Sᵣ(dBm)</div>
+          <p>Doit être <strong>toujours positive</strong> !</p>
+        </div>
+      </div>
+      <div class="card card-formula">
+        <div class="card-label">Budget de liaison B</div>
+        <div class="formula">B(dB) = Pₑ(dBm) − Sᵣ(dBm)</div>
+        <p style="margin:8px 0 0;">Le budget représente la "réserve" totale disponible entre la puissance d'émission et le seuil du récepteur.</p>
+      </div>
+      <div class="card card-warning">
+        <div class="card-label">⚠ Limite de l'hypsogramme</div>
+        <p style="margin:0;">L'hypsogramme est réalisé pour <strong>une fréquence donnée</strong>. Il ne renseigne pas sur le comportement fréquentiel des dispositifs → nécessité d'outils plus évolués (Chapitres 2, 3, 4).</p>
+      </div>
+    </div>
+
+    <!-- EXERCICES -->
+    <div id="ch1-exos" class="tab-content">
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD1 · Ex3</span>
+          <span class="exercise-title">Liaison WiFi inter-bâtiments (2,45 GHz)</span>
+          <span class="exercise-badge badge-td">TD n°1</span>
+        </div>
+        <div class="exercise-body">
+          <p>On souhaite partager un accès Internet entre 2 bâtiments distants de <strong>D = 100 m</strong>, à la fréquence <strong>f₀ = 2,45 GHz</strong>. La marge de liaison imposée est de <strong>+5 dB</strong>.</p>
+          <table>
+            <tr><th>Paramètre</th><th>Point 1 (Cisco)</th><th>Point 2 (Trendnet)</th><th>Unité</th></tr>
+            <tr><td>Puissance d'émission</td><td>16</td><td>13</td><td>dBm</td></tr>
+            <tr><td>Seuil récept. à 11 Mbps</td><td>−47</td><td>−50</td><td>dBm</td></tr>
+            <tr><td>Seuil récept. à 1 Mbps</td><td>−64</td><td>−55</td><td>dBm</td></tr>
+            <tr><td>Pertes câbles</td><td>1</td><td>3</td><td>dB</td></tr>
+            <tr><td>Gain antenne</td><td>6</td><td>7</td><td>dBi</td></tr>
+          </table>
+          <p>La formule d'atténuation dans l'air est : <em>α(dB) = 20·log(4πDf₀/c)</em></p>
+
+          <div class="question"><strong>Q1</strong> Calculer l'atténuation dans l'air à 2,45 GHz pour D = 100 m.</div>
+          <div class="question"><strong>Q2</strong> Réaliser l'hypsogramme sens descendant (P1 → P2) et calculer Pᵣ au bâtiment 2.</div>
+          <div class="question"><strong>Q3</strong> Quels débits sont possibles dans les 2 sens ? Y a-t-il une marge de +5 dB ?</div>
+          <div class="question"><strong>Q4 (fibre)</strong> Une diode émet Pₑ = 0,2 mW. Fibre : 0,8 dB/km. Seuil récepteur Sr = −14 dBm. Marge = 5 dB. Calculer le budget de liaison et la distance maximale.</div>
+
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction détaillée</h5>
+
+            <div class="step">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <strong>Atténuation dans l'air :</strong><br>
+                α(dB) = 20·log(4π × 100 × 2,45×10⁹ / 3×10⁸)<br>
+                = 20·log(4π × 816,67) = 20·log(10 261) = 20 × 4,011
+                <div class="result">α ≈ 80,2 dB</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <strong>Hypsogramme descendant (P1 → P2) :</strong><br>
+                Pᵣ = Pₑ − câble₁ + ant₁ − α + ant₂ − câble₂<br>
+                = 16 − 1 + 6 − 80,2 + 7 − 3
+                <div class="result">Pᵣ(B2) ≈ −55,2 dBm</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <strong>Vérification des débits (sens descendant) :</strong><br>
+                • Seuil 11 Mbps de Trendnet = −50 dBm → Marge = −55,2 − (−50) = <strong style="color:var(--red)">−5,2 dB ❌</strong> (insuffisant)<br>
+                • Seuil 1 Mbps de Trendnet = −55 dBm → Marge = −55,2 − (−55) = <strong style="color:var(--red)">−0,2 dB ❌</strong><br>
+                → Il faut un <strong>amplificateur</strong> pour respecter la marge de +5 dB.
+                <div class="result">Gain ampli nécessaire ≈ 10 dB (pour 11 Mbps)</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <strong>Exercice fibre optique :</strong><br>
+                Pₑ = 0,2 mW → Pₑ(dBm) = 10·log(0,2/1) = 10·log(0,2) ≈ <strong>−7 dBm</strong><br>
+                Budget = Pₑ − Sᵣ = −7 − (−14) = <strong>7 dB</strong><br>
+                Budget utile = 7 − 5 (marge) = 2 dB disponibles pour la fibre<br>
+                L_max = 2 / 0,8
+                <div class="result">L_max = 2,5 km</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD1 · Ex1</span>
+          <span class="exercise-title">Rapport Signal-à-Bruit (RSB) — canal TNT</span>
+          <span class="exercise-badge badge-td">TD n°1</span>
+        </div>
+        <div class="exercise-body">
+          <p>Un canal TNT reçu par une antenne (résistance 75 Ω). Niveau de la raie centrale : <strong>S₁ = 70 dBµV</strong>. Niveau du bruit : <strong>B = 6 dBµV</strong>.</p>
+          <div class="question"><strong>Q1</strong> Convertir 70 dBµV en Volt.</div>
+          <div class="question"><strong>Q2</strong> Calculer la puissance de la raie en Watt et en dBm.</div>
+          <div class="question"><strong>Q3</strong> Donner et calculer le RSB. Est-il de bonne qualité ?</div>
+
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction détaillée</h5>
+            <div class="step">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <strong>Conversion dBµV → Volt :</strong><br>
+                70 dBµV = 20·log(V / 1µV) = 70 → V = 10^(70/20) × 1µV = 10^3,5 × 1µV = 3162 µV
+                <div class="result">S₁ ≈ 3,16 mV (efficace)</div>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <strong>Puissance sur R = 75 Ω :</strong><br>
+                P = V²/R = (3,16×10⁻³)² / 75 = 10⁻⁵ / 75 ≈ 1,33×10⁻⁷ W<br>
+                P(dBm) = 10·log(1,33×10⁻⁷ / 10⁻³) = 10·log(1,33×10⁻⁴) ≈ −38,8 dBm<br>
+                Bruit : 6 dBµV → V_bruit = 2 µV → P_bruit = (2×10⁻⁶)² / 75 ≈ 5,3×10⁻¹⁴ W → ≈ −102,7 dBm
+                <div class="result">P_signal ≈ −38,8 dBm · P_bruit ≈ −102,7 dBm</div>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <strong>RSB :</strong><br>
+                RSB(dB) = P_signal(dBm) − P_bruit(dBm) = −38,8 − (−102,7) = <strong>63,9 dB</strong><br>
+                Ou bien directement en dBµV : RSB = 70 − 6 = 64 dB ✓<br>
+                Un RSB &gt; 10 dB est généralement acceptable. 64 dB est excellent !
+                <div class="result">RSB ≈ 64 dB — excellente qualité ✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">BONUS</span>
+          <span class="exercise-title">Exercice inventé — Amplificateur et marge de liaison</span>
+          <span class="exercise-badge badge-bonus">Bonus</span>
+        </div>
+        <div class="exercise-body">
+          <p>Un émetteur émet à <strong>Pₑ = 20 dBm</strong>. La chaîne comprend : câble (−3 dB) → antenne émettrice (+8 dB) → propagation (−95 dB) → antenne réceptrice (+5 dB) → câble (−2 dB) → récepteur (Sᵣ = −60 dBm).</p>
+          <div class="question"><strong>Q1</strong> Calculer la puissance reçue Pᵣ.</div>
+          <div class="question"><strong>Q2</strong> Calculer la marge et le budget de liaison.</div>
+          <div class="question"><strong>Q3</strong> Si la marge minimale requise est 10 dB, quel gain d'amplificateur insérer entre antenne réceptrice et câble récepteur ?</div>
+
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              Pᵣ = 20 − 3 + 8 − 95 + 5 − 2 = <strong>−67 dBm</strong>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              Marge = Pᵣ − Sᵣ = −67 − (−60) = −7 dB → <strong style="color:var(--red)">insuffisante !</strong><br>
+              Budget = Pₑ − Sᵣ = 20 − (−60) = <strong>80 dB</strong>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              Pour Marge = +10 dB : Pᵣ doit valoir Sᵣ + 10 = −50 dBm<br>
+              Il manque −50 − (−67) = 17 dB → <div class="result">Gain amplificateur nécessaire = 17 dB</div>
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CHAPITRE 2 ─── -->
+<div id="page-ch2" class="chapter-page">
+  <div class="chapter-header">
+    <div class="ch-info">
+      <div class="ch-tag">Chapitre 2</div>
+      <h2>Représentation temporelle et fréquentielle</h2>
+    </div>
+    <div class="tab-switcher">
+      <button class="tab-btn active" onclick="switchTab(this,'ch2','cours')">📖 Cours</button>
+      <button class="tab-btn" onclick="switchTab(this,'ch2','exos')">✏️ Exercices</button>
+    </div>
+  </div>
+
+  <div class="content-wrap">
+    <div id="ch2-cours" class="tab-content active">
+      <h3>I — Représentation temporelle</h3>
+
+      <div class="grid-2">
+        <div class="card card-key">
+          <div class="card-label">Signal sinusoïdal</div>
+          <div class="formula">s(t) = A₀·cos(ω₀t + φ)
+ω₀ = 2πf₀
+T₀ = 1/f₀</div>
+          <p style="margin:8px 0 0;">Valeur efficace : <em>Aeff = A₀/√2</em></p>
+        </div>
+        <div class="card card-key">
+          <div class="card-label">Signal carré</div>
+          <p>Défini par sa période T₀, ses niveaux Amin/Amax et son <strong>rapport cyclique</strong> :</p>
+          <div class="formula">Rc = Th / T₀</div>
+          <p style="margin:4px 0 0;">Impulsion : Rc → 0</p>
+        </div>
+      </div>
+
+      <div class="card card-key">
+        <div class="card-label">Signal numérique NRZ</div>
+        <p>"0" logique = 0 V ; "1" logique = E V. Débit = 1/Tb (en bits/s).</p>
+      </div>
+
+      <!-- SVG Signaux -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:760px;display:block;margin:auto;">
+          <!-- Sinusoïdal -->
+          <text x="10" y="30" fill="#58d4e0" font-size="12">Sinusoïdal</text>
+          <line x1="10" y1="90" x2="350" y2="90" stroke="#30363d" stroke-width="1"/>
+          <line x1="10" y1="40" x2="10" y2="130" stroke="#30363d" stroke-width="1"/>
+          <path d="M 10,90 C 28,40 48,40 68,90 C 88,140 108,140 128,90 C 148,40 168,40 188,90 C 208,140 228,140 248,90 C 268,40 288,40 308,90 C 328,140 348,140 350,90" fill="none" stroke="#58d4e0" stroke-width="2"/>
+          <text x="180" y="155" text-anchor="middle" fill="#6e7681" font-size="10">T₀</text>
+          <line x1="10" y1="150" x2="128" y2="150" stroke="#6e7681" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="128" y1="150" x2="248" y2="150" stroke="#f0a93a" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <line x1="10" y1="148" x2="10" y2="152" stroke="#6e7681" stroke-width="1.5"/>
+          <line x1="128" y1="148" x2="128" y2="152" stroke="#6e7681" stroke-width="1.5"/>
+          <line x1="248" y1="148" x2="248" y2="152" stroke="#6e7681" stroke-width="1.5"/>
+          <text x="188" y="165" text-anchor="middle" fill="#f0a93a" font-size="10">T₀</text>
+          <text x="25" y="58" fill="#f0a93a" font-size="10">+A₀</text>
+          <text x="25" y="128" fill="#f0a93a" font-size="10">−A₀</text>
+          <!-- Carré -->
+          <text x="400" y="30" fill="#bc8cff" font-size="12">Carré (Rc = 1/3)</text>
+          <line x1="400" y1="90" x2="750" y2="90" stroke="#30363d" stroke-width="1"/>
+          <line x1="400" y1="40" x2="400" y2="140" stroke="#30363d" stroke-width="1"/>
+          <!-- Waveform carré -->
+          <polyline points="400,90 400,50 450,50 450,90 530,90 530,50 580,50 580,90 660,90 660,50 710,50 710,90 750,90" fill="none" stroke="#bc8cff" stroke-width="2"/>
+          <text x="425" y="38" fill="#8b949e" font-size="9">Th</text>
+          <line x1="400" y1="32" x2="450" y2="32" stroke="#8b949e" stroke-width="1" stroke-dasharray="2,2"/>
+          <text x="560" y="155" text-anchor="middle" fill="#6e7681" font-size="10">T₀</text>
+          <line x1="400" y1="150" x2="530" y2="150" stroke="#6e7681" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="400" y1="148" x2="400" y2="152" stroke="#6e7681" stroke-width="1.5"/>
+          <line x1="530" y1="148" x2="530" y2="152" stroke="#6e7681" stroke-width="1.5"/>
+        </svg>
+        <div class="diagram-caption">Figure 2 — Signal sinusoïdal (gauche) et signal carré Rc=1/3 (droite)</div>
+      </div>
+
+      <h3>II — Représentation fréquentielle & Théorème de Fourier</h3>
+
+      <div class="card card-formula">
+        <div class="card-label">Théorème de Fourier (DSF)</div>
+        <p>Tout signal périodique de fréquence f₀ est décomposable en une somme de cosinus :</p>
+        <div class="formula">s(t) = C₀ + Σ Cₙ·cos(n·ω₀·t + φₙ)   (n = 1, 2, 3…)
+<span class="comment"># C₀ = valeur moyenne, Cₙ = amplitude des harmoniques</span></div>
+      </div>
+
+      <h4>Spectres importants à connaître</h4>
+      <table>
+        <tr><th>Signal</th><th>DSF</th><th>Spectre</th></tr>
+        <tr><td>Sinusoïde A·cos(ω₀t)</td><td>Une raie à f₀, amplitude A</td><td>1 raie</td></tr>
+        <tr><td>Carré (−E à +E, Rc=1/2)</td><td>4E/π · [sin(ω₀t) + sin(3ω₀t)/3 + sin(5ω₀t)/5 + …]</td><td>Raies impaires : f₀, 3f₀, 5f₀…</td></tr>
+        <tr><td>Signal NRZ 101010… (0 et E)</td><td>E/2 + 2E/π·[sin(ω₀t) − sin(3ω₀t)/3 + …]</td><td>Composante continue + impaires</td></tr>
+      </table>
+
+      <!-- SVG Spectre -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:auto;">
+          <!-- Axes -->
+          <line x1="50" y1="140" x2="650" y2="140" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arrowR2)"/>
+          <defs>
+            <marker id="arrowR2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#8b949e"/>
+            </marker>
+          </defs>
+          <line x1="80" y1="20" x2="80" y2="150" stroke="#8b949e" stroke-width="1.5"/>
+          <text x="655" y="144" fill="#8b949e" font-size="12">f</text>
+          <text x="65" y="18" fill="#8b949e" font-size="12">|Cₙ|</text>
+          <!-- Signal sinusoïdal -->
+          <text x="170" y="15" fill="#58d4e0" font-size="11">Sinusoïde A·cos(2πf₀t)</text>
+          <line x1="200" y1="30" x2="200" y2="140" stroke="#58d4e0" stroke-width="8" stroke-linecap="round"/>
+          <text x="200" y="155" text-anchor="middle" fill="#58d4e0" font-size="10">f₀</text>
+          <text x="210" y="55" fill="#58d4e0" font-size="10">A</text>
+          <!-- Signal carré -->
+          <text x="380" y="15" fill="#bc8cff" font-size="11">Carré sym. (0/E, Rc=1/2)</text>
+          <line x1="400" y1="45" x2="400" y2="140" stroke="#bc8cff" stroke-width="8" stroke-linecap="round"/>
+          <line x1="460" y1="90" x2="460" y2="140" stroke="#bc8cff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+          <line x1="520" y1="105" x2="520" y2="140" stroke="#bc8cff" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+          <line x1="580" y1="114" x2="580" y2="140" stroke="#bc8cff" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+          <text x="400" y="155" text-anchor="middle" fill="#bc8cff" font-size="10">f₀</text>
+          <text x="460" y="155" text-anchor="middle" fill="#bc8cff" font-size="10">3f₀</text>
+          <text x="520" y="155" text-anchor="middle" fill="#bc8cff" font-size="10">5f₀</text>
+          <text x="580" y="155" text-anchor="middle" fill="#bc8cff" font-size="10">7f₀</text>
+          <!-- Valeur moyenne carré -->
+          <line x1="80" y1="92" x2="650" y2="92" stroke="#f0a93a" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+          <text x="56" y="96" fill="#f0a93a" font-size="9">C₀</text>
+        </svg>
+        <div class="diagram-caption">Figure 3 — Spectres : sinusoïde (1 raie) vs signal carré (harmoniques impaires)</div>
+      </div>
+
+      <h3>III — Puissances et théorème de Parseval</h3>
+      <div class="card card-formula">
+        <div class="card-label">Parseval — Puissance normalisée (R=1Ω)</div>
+        <div class="formula">P_moy = C₀² + Σ (Cₙ/√2)²  =  Σ Cₙ_eff²
+<span class="comment"># La puissance totale = somme des puissances de chaque raie</span></div>
+      </div>
+      <div class="grid-2">
+        <div class="card card-key">
+          <div class="card-label">Puissance instantanée</div>
+          <div class="formula">p(t) = v(t)² / R</div>
+        </div>
+        <div class="card card-key">
+          <div class="card-label">Valeur efficace</div>
+          <div class="formula">V_eff = A₀/√2   (sinusoïde)
+V_eff = E·√Rc   (carré)</div>
+        </div>
+      </div>
+
+      <h4>Unités spectrales</h4>
+      <table>
+        <tr><th>Unité</th><th>Formule</th><th>Usage</th></tr>
+        <tr><td>dBV</td><td>20·log(V_eff / 1V)</td><td>Tension efficace par rapport à 1V</td></tr>
+        <tr><td>dBµV</td><td>20·log(V_eff / 1µV)</td><td>Mesures RF (analyseur)</td></tr>
+        <tr><td>dBm</td><td>10·log(P_moy / 1mW)</td><td>Puissance</td></tr>
+      </table>
+    </div>
+
+    <div id="ch2-exos" class="tab-content">
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD2 · Ex1</span>
+          <span class="exercise-title">Signal sinusoïdal — spectre et puissance</span>
+          <span class="exercise-badge badge-td">TD n°2</span>
+        </div>
+        <div class="exercise-body">
+          <p>Signal cosinus : <strong>fₚ = 100 MHz</strong>, amplitude crête <strong>A₁ = 2 V</strong>, valeur moyenne <strong>A₀ = 0</strong>, déphasage <strong>φ₀ = 0</strong>.</p>
+          <div class="question"><strong>Q1</strong> Expression mathématique S(t) = ?</div>
+          <div class="question"><strong>Q2</strong> Valeur efficace et puissance normalisée (R=1Ω).</div>
+          <div class="question"><strong>Q3</strong> Valeur de la raie en dBV et en dBm (R=1Ω).</div>
+          <div class="question"><strong>Q4</strong> Maintenant A₀ = 3 V. Nouvelle expression, spectre en dBV et puissance (Parseval).</div>
+
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              <div class="result">S(t) = 2·cos(2π·100×10⁶·t)</div>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              V_eff = 2/√2 = <strong>√2 ≈ 1,414 V</strong><br>
+              P = V²_eff / 1 = 1,414² = <strong>2 W</strong>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              dBV = 20·log(1,414/1) = 20·log(√2) = 20×0,15 = <strong>3 dBV</strong><br>
+              dBm = 10·log(2/0,001) = 10·log(2000) = 10×3,301 = <strong>33 dBm</strong>
+            </div></div>
+            <div class="step"><span class="step-num">4</span><div class="step-body">
+              S(t) = 3 + 2·cos(2π×10⁸t)<br>
+              Spectre : raie à 0 Hz (DC) valant 3 V = 20·log(3) ≈ <strong>9,54 dBV</strong><br>
+              Raie à 100 MHz valant 1,414 V_eff = <strong>3 dBV</strong><br>
+              Parseval : P = 3² + (2/√2)² = 9 + 2 = <strong>11 W</strong>
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD2 · Ex2</span>
+          <span class="exercise-title">Tracé de spectres et théorème de Parseval</span>
+          <span class="exercise-badge badge-td">TD n°2</span>
+        </div>
+        <div class="exercise-body">
+          <p>Signal : <strong>S(t) = 5·cos(2π×1000t) + 4·cos(2π×2000t) + 3·cos(2π×3000t) + 2·cos(2π×4000t)</strong></p>
+          <div class="question"><strong>Q1</strong> Valeur moyenne du signal.</div>
+          <div class="question"><strong>Q2</strong> Spectre en amplitude (tension crête) et valeurs efficaces de chaque raie.</div>
+          <div class="question"><strong>Q3</strong> Puissance normalisée totale par Parseval.</div>
+
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">Valeur moyenne C₀ = <strong>0 V</strong> (aucun terme constant)</div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              <table>
+                <tr><th>f (Hz)</th><th>Acrête (V)</th><th>Aeff = A/√2 (V)</th></tr>
+                <tr><td>1000</td><td>5</td><td>3,54</td></tr>
+                <tr><td>2000</td><td>4</td><td>2,83</td></tr>
+                <tr><td>3000</td><td>3</td><td>2,12</td></tr>
+                <tr><td>4000</td><td>2</td><td>1,41</td></tr>
+              </table>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              P = (5²+4²+3²+2²)/2 = (25+16+9+4)/2 = 54/2 = <div class="result">P = 27 W</div>
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD2 · Ex5</span>
+          <span class="exercise-title">DSF d'un signal NRZ (débit 1 Gbit/s)</span>
+          <span class="exercise-badge badge-td">TD n°2</span>
+        </div>
+        <div class="exercise-body">
+          <p>Signal NRZ : "0"→0 V, "1"→5 V. Durée d'un bit <strong>Tb = 1 ns</strong>. Suite : 101010…</p>
+          <div class="question"><strong>Q1</strong> Période et fréquence du signal périodique obtenu.</div>
+          <div class="question"><strong>Q2</strong> Valeur moyenne et puissance.</div>
+          <div class="question"><strong>Q3</strong> Expression DSF jusqu'à l'harmonique 7 (voir table de l'annexe TD2).</div>
+
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              Suite 10 répétée → motif de 2 bits → T₀ = 2×Tb = 2 ns<br>
+              <div class="result">f₀ = 1/T₀ = 500 MHz</div>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              Valeur moy = E×Rc = 5×0,5 = <strong>2,5 V</strong><br>
+              Puissance normalisée = E²×Rc = 25×0,5 = <strong>12,5 W</strong>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              Carré 0/E → C₀ = E/2 = 2,5 V ; harmoniques : Cₙ = (2E/nπ) pour n impair<br>
+              C₁ = 2×5/π ≈ 3,18 V à 500 MHz<br>
+              C₃ = 2×5/(3π) ≈ 1,06 V à 1,5 GHz<br>
+              C₅ = 2×5/(5π) ≈ 0,64 V à 2,5 GHz<br>
+              C₇ = 2×5/(7π) ≈ 0,46 V à 3,5 GHz<br>
+              <div class="result">S(t) = 2,5 + 3,18·sin(2π×5×10⁸t) + 1,06·sin(2π×1,5×10⁹t) + …</div>
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">BONUS</span>
+          <span class="exercise-title">Conversion dBV ↔ Volt ↔ dBm — exercice récapitulatif</span>
+          <span class="exercise-badge badge-bonus">Bonus</span>
+        </div>
+        <div class="exercise-body">
+          <p>Un analyseur de spectres affiche une raie à <strong>−6 dBV</strong>. La résistance de référence est 50 Ω.</p>
+          <div class="question"><strong>Q1</strong> Quelle est la tension efficace correspondante ?</div>
+          <div class="question"><strong>Q2</strong> Quelle est la puissance en Watt et en dBm ?</div>
+          <div class="question"><strong>Q3</strong> Si on veut exprimer en dBµV : quelle est la valeur ?</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              −6 dBV = 20·log(V/1V) = −6 → V = 10^(−6/20) = 10^(−0,3) ≈ <strong>0,5 V_eff</strong>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              P = V²/R = 0,25/50 = 5×10⁻³ W = 5 mW<br>
+              <div class="result">P = 10·log(5) ≈ +7 dBm</div>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              dBµV = 20·log(V_eff / 1µV) = 20·log(0,5 / 10⁻⁶) = 20·log(5×10⁵) = 20×5,699
+              <div class="result">≈ 114 dBµV</div>
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CHAPITRE 3 ─── -->
+<div id="page-ch3" class="chapter-page">
+  <div class="chapter-header">
+    <div class="ch-info">
+      <div class="ch-tag">Chapitre 3</div>
+      <h2>Analyse spectrale de signaux réels</h2>
+    </div>
+    <div class="tab-switcher">
+      <button class="tab-btn active" onclick="switchTab(this,'ch3','cours')">📖 Cours</button>
+      <button class="tab-btn" onclick="switchTab(this,'ch3','exos')">✏️ Exercices</button>
+    </div>
+  </div>
+
+  <div class="content-wrap">
+    <div id="ch3-cours" class="tab-content active">
+      <h3>I — L'analyseur de spectres (A.S.)</h3>
+      <p>Instrument mesurant la <strong>répartition en fréquence</strong> d'un signal. Il représente la tension efficace ou la puissance en fonction de la fréquence.</p>
+
+      <div class="grid-2">
+        <div class="card card-key">
+          <div class="card-label">A.S. à balayage</div>
+          <p>Analyse chaque fréquence séparément à l'aide d'un <strong>filtre passe-bande glissant</strong>. La largeur de ce filtre s'appelle le <strong>RBW</strong>.</p>
+        </div>
+        <div class="card card-key">
+          <div class="card-label">FFT oscilloscope</div>
+          <p>Algorithme mathématique calculant le spectre d'un signal numérisé. Rapide mais moins sensible.</p>
+        </div>
+      </div>
+
+      <h4>Paramètres à régler sur un A.S.</h4>
+      <table>
+        <tr><th>Paramètre</th><th>Description</th><th>Conseil</th></tr>
+        <tr><td><strong>Fréq. centrale / SPAN</strong></td><td>Plage horizontale d'observation</td><td>Centrer sur le signal, SPAN ≈ 5× largeur canal</td></tr>
+        <tr><td><strong>Niveau de référence</strong></td><td>Valeur en haut de l'écran (dBm ou dBµV)</td><td>Légèrement au-dessus de la raie la plus haute</td></tr>
+        <tr><td><strong>Échelle verticale</strong></td><td>dB/carreau</td><td>10 dB/div est le réglage courant</td></tr>
+        <tr><td><strong>RBW</strong></td><td>Largeur du filtre de résolution</td><td>&lt; écart entre raies, ≈ SPAN/10 au minimum</td></tr>
+        <tr><td><strong>VBW</strong></td><td>Filtre moyenneur vidéo</td><td>≤ RBW pour lisser l'affichage</td></tr>
+        <tr><td><strong>Sweep Time</strong></td><td>Durée du balayage</td><td>Souvent automatique, lié au RBW</td></tr>
+      </table>
+
+      <!-- SVG Analyseur de spectres -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:auto;">
+          <!-- Écran A.S. simulé -->
+          <rect x="60" y="20" width="600" height="170" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+          <!-- Grille -->
+          <g stroke="#1f2937" stroke-width="1">
+            <line x1="120" y1="20" x2="120" y2="190"/>
+            <line x1="180" y1="20" x2="180" y2="190"/>
+            <line x1="240" y1="20" x2="240" y2="190"/>
+            <line x1="300" y1="20" x2="300" y2="190"/>
+            <line x1="360" y1="20" x2="360" y2="190"/>
+            <line x1="420" y1="20" x2="420" y2="190"/>
+            <line x1="480" y1="20" x2="480" y2="190"/>
+            <line x1="540" y1="20" x2="540" y2="190"/>
+            <line x1="600" y1="20" x2="600" y2="190"/>
+            <line x1="60" y1="53" x2="660" y2="53"/>
+            <line x1="60" y1="87" x2="660" y2="87"/>
+            <line x1="60" y1="121" x2="660" y2="121"/>
+            <line x1="60" y1="155" x2="660" y2="155"/>
+          </g>
+          <!-- Bruit de fond -->
+          <path d="M 60,175 Q 100,172 140,173 Q 180,174 220,172 Q 260,175 300,173 Q 340,172 380,174 Q 420,173 460,175 Q 500,172 540,174 Q 580,173 620,175 L 660,174" fill="none" stroke="#2a6b72" stroke-width="1.5"/>
+          <!-- Raie principale -->
+          <line x1="300" y1="30" x2="300" y2="173" stroke="#58d4e0" stroke-width="6" stroke-linecap="round"/>
+          <!-- Raies latérales (harmoniques) -->
+          <line x1="360" y1="100" x2="360" y2="173" stroke="#58d4e0" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+          <line x1="240" y1="100" x2="240" y2="173" stroke="#58d4e0" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+          <line x1="420" y1="135" x2="420" y2="173" stroke="#58d4e0" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+          <line x1="180" y1="135" x2="180" y2="173" stroke="#58d4e0" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+          <!-- Labels -->
+          <text x="62" y="37" fill="#f0a93a" font-size="10">REF</text>
+          <text x="62" y="50" fill="#6e7681" font-size="9">0 dBm</text>
+          <text x="62" y="84" fill="#6e7681" font-size="9">−10</text>
+          <text x="62" y="118" fill="#6e7681" font-size="9">−20</text>
+          <text x="62" y="152" fill="#6e7681" font-size="9">−30</text>
+          <text x="62" y="186" fill="#6e7681" font-size="9">−40</text>
+          <!-- Freq labels -->
+          <text x="300" y="205" text-anchor="middle" fill="#58d4e0" font-size="10">f₀</text>
+          <text x="360" y="205" text-anchor="middle" fill="#8b949e" font-size="9">f₀+Δf</text>
+          <text x="240" y="205" text-anchor="middle" fill="#8b949e" font-size="9">f₀−Δf</text>
+          <!-- RBW arrow -->
+          <line x1="285" y1="145" x2="315" y2="145" stroke="#f0a93a" stroke-width="1.5"/>
+          <text x="300" y="162" text-anchor="middle" fill="#f0a93a" font-size="9">RBW</text>
+        </svg>
+        <div class="diagram-caption">Figure 4 — Écran d'analyseur de spectres : raie principale + harmoniques, bruit de fond, RBW</div>
+      </div>
+
+      <h3>II — Exploitation d'un spectre</h3>
+      <div class="card card-formula">
+        <div class="card-label">Lire une raie en dBµV → Volt efficace</div>
+        <div class="formula">V_eff(V) = 10^(dBµV / 20) × 10⁻⁶</div>
+      </div>
+      <div class="card card-formula">
+        <div class="card-label">Densité Spectrale de Puissance (DSP)</div>
+        <div class="formula">DSP (W/Hz) = P_canal (W) / BW (Hz)
+<span class="comment"># BW = bande passante du canal mesurée sur le spectre</span></div>
+      </div>
+      <div class="card card-formula">
+        <div class="card-label">Taux de Distorsion Harmonique (THD)</div>
+        <div class="formula">THD (%) = √(Σ Cₙ_eff² pour n≥2) / C₁_eff × 100
+<span class="comment"># C₁ = fondamental, Cₙ = harmoniques de rang n</span></div>
+      </div>
+      <div class="card card-key">
+        <div class="card-label">Rapport Signal-à-Bruit (RSB)</div>
+        <div class="formula">RSB(dB) = Niveau_signal(dBm) − Niveau_bruit(dBm)</div>
+        <p style="margin:8px 0 0;">Un RSB &gt; 10 dB est généralement acceptable. En radiodiffusion FM, on vise &gt; 30 dB.</p>
+      </div>
+    </div>
+
+    <div id="ch3-exos" class="tab-content">
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD3 · Ex1</span>
+          <span class="exercise-title">Lecture d'un spectre sinusoïdal — sinus à 2 GHz</span>
+          <span class="exercise-badge badge-td">TD n°3</span>
+        </div>
+        <div class="exercise-body">
+          <p>Signal : <em>U(t) = U₀·sin(ω₀·t)</em>, amplitude <strong>3 V crête</strong>, fréquence <strong>2 GHz</strong>, sur une charge de 50 Ω.</p>
+          <div class="question"><strong>Q1</strong> Calculer la valeur efficace et la puissance en dBm.</div>
+          <div class="question"><strong>Q2</strong> Tracer le spectre de puissance (en dBm) — quelle hauteur de raie ?</div>
+          <div class="question"><strong>Q3</strong> Sur un analyseur : niveau de référence = 20 dBm, échelle 10 dB/div — à quelle hauteur (en carreaux depuis le haut) la raie apparaît-elle ?</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              V_eff = 3/√2 ≈ 2,12 V<br>
+              P = V²_eff / R = 2,12²/50 = 4,5/50 = 0,09 W = 90 mW
+              <div class="result">P = 10·log(90) ≈ +19,5 dBm</div>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              Spectre de puissance : 1 raie à 2 GHz de hauteur <strong>+19,5 dBm</strong>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              Décalage depuis REF = 20 − 19,5 = 0,5 dB → la raie est à <strong>0,05 carreau</strong> sous le haut de l'écran (quasi au sommet)
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD4 · Ex1</span>
+          <span class="exercise-title">Canal TNT — DSP et puissance de canal</span>
+          <span class="exercise-badge badge-td">TD n°4</span>
+        </div>
+        <div class="exercise-body">
+          <p>Canal DVB-C relevé à l'analyseur. Données lues sur le spectre :</p>
+          <ul style="margin:10px 0 10px 20px; color:var(--text2); line-height:1.8; font-size:14px;">
+            <li>Fréquence centrale : <strong>300 MHz</strong></li>
+            <li>Niveau du canal : <strong>−35 dBm</strong></li>
+            <li>Bande à −3 dB : <strong>8 MHz</strong></li>
+            <li>Niveau du bruit : <strong>−65 dBm</strong></li>
+            <li>RBW : 100 kHz</li>
+          </ul>
+          <div class="question"><strong>Q1</strong> Calculer le RSB. Est-il satisfaisant ?</div>
+          <div class="question"><strong>Q2</strong> Calculer le niveau de la raie centrale en Watt.</div>
+          <div class="question"><strong>Q3</strong> Calculer la DSP en W/Hz et la puissance totale du canal en dBm.</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              RSB = −35 − (−65) = <strong>30 dB</strong> — acceptable pour un canal TV numérique ✓
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              P_raie = 10^(−35/10) × 10⁻³ = 10^(−3,5) × 10⁻³ = 3,16×10⁻⁴ × 10⁻³
+              <div class="result">P_raie ≈ 3,16×10⁻⁷ W ≈ 316 nW</div>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              La mesure est faite avec RBW = 100 kHz, donc la hauteur affichée = puissance dans 100 kHz.<br>
+              DSP = P_raie / RBW = 3,16×10⁻⁷ / 10⁵ = <strong>3,16×10⁻¹² W/Hz</strong><br>
+              P_canal = DSP × BW_canal = 3,16×10⁻¹² × 8×10⁶ = 2,53×10⁻⁵ W = 25,3 µW
+              <div class="result">P_canal = 10·log(2,53×10⁻²) ≈ −16 dBm</div>
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD3 · Ex5</span>
+          <span class="exercise-title">Taux de Distorsion Harmonique (THD) du secteur</span>
+          <span class="exercise-badge badge-td">TD n°3</span>
+        </div>
+        <div class="exercise-body">
+          <p>Réseau secteur très perturbé par un moteur. Le spectre montre les composantes suivantes :</p>
+          <table>
+            <tr><th>Harmonique</th><th>Rang n</th><th>V_eff (V)</th></tr>
+            <tr><td>Fondamental (50 Hz)</td><td>1</td><td>220</td></tr>
+            <tr><td>H3 (150 Hz)</td><td>3</td><td>44</td></tr>
+            <tr><td>H5 (250 Hz)</td><td>5</td><td>22</td></tr>
+            <tr><td>H7 (350 Hz)</td><td>7</td><td>8</td></tr>
+          </table>
+          <div class="question"><strong>Q1</strong> Calculer le THD de cette tension secteur.</div>
+          <div class="question"><strong>Q2</strong> Interpréter le résultat. Le réseau est-il de bonne qualité ?</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              THD = √(44² + 22² + 8²) / 220 × 100<br>
+              = √(1936 + 484 + 64) / 220 × 100<br>
+              = √2484 / 220 × 100<br>
+              = 49,84 / 220 × 100
+              <div class="result">THD ≈ 22,7 %</div>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              Un réseau secteur de bonne qualité a un THD &lt; 5 %. Ici <strong>22,7 %</strong> est très élevé → perturbations importantes dues au moteur (charges non-linéaires). Cela peut endommager les équipements sensibles.
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">BONUS</span>
+          <span class="exercise-title">Réglage d'un analyseur — Paramétrage complet</span>
+          <span class="exercise-badge badge-bonus">Bonus</span>
+        </div>
+        <div class="exercise-body">
+          <p>On veut observer un signal GSM à <strong>947,5 MHz</strong> (canal de 200 kHz). La raie principale a une puissance estimée de <strong>−40 dBm</strong>.</p>
+          <div class="question"><strong>Q1</strong> Choisir la fréquence centrale et le SPAN.</div>
+          <div class="question"><strong>Q2</strong> Choisir le niveau de référence et l'échelle.</div>
+          <div class="question"><strong>Q3</strong> Choisir le RBW et justifier.</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              Fréquence centrale = <strong>947,5 MHz</strong><br>
+              SPAN = 5 × 200 kHz = 1 MHz (ou 2 MHz pour voir le voisinage)
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              Niveau de référence = −30 dBm (légèrement au-dessus de −40 dBm)<br>
+              Échelle = 10 dB/div → l'écran représente 8 × 10 = 80 dB
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              RBW &lt; largeur canal = 200 kHz. Choisir <strong>RBW = 10 kHz</strong> (≈ SPAN/100 = 10 kHz → bon compromis résolution/vitesse)
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CHAPITRE 4 ─── -->
+<div id="page-ch4" class="chapter-page">
+  <div class="chapter-header">
+    <div class="ch-info">
+      <div class="ch-tag">Chapitre 4</div>
+      <h2>Les Filtres</h2>
+    </div>
+    <div class="tab-switcher">
+      <button class="tab-btn active" onclick="switchTab(this,'ch4','cours')">📖 Cours</button>
+      <button class="tab-btn" onclick="switchTab(this,'ch4','exos')">✏️ Exercices</button>
+    </div>
+  </div>
+
+  <div class="content-wrap">
+    <div id="ch4-cours" class="tab-content active">
+      <h3>I — Définition et types de filtres</h3>
+      <p>Un <strong>filtre</strong> est un dispositif qui <strong>sélectionne certaines fréquences</strong> et en rejette d'autres. Sa caractéristique fondamentale est la <strong>fonction de transfert T(f)</strong>.</p>
+
+      <div class="card card-formula">
+        <div class="card-label">Fonction de transfert & Gain</div>
+        <div class="formula">T(f) = Vs_eff(f) / Ve_eff(f)     (linéaire, sans unité)
+T_dB(f) = 20·log(Vs_eff / Ve_eff)   (en dB)</div>
+      </div>
+
+      <!-- SVG 4 types de filtres -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:760px;display:block;margin:auto;">
+          <!-- Passe-bas -->
+          <text x="95" y="20" text-anchor="middle" fill="#58d4e0" font-size="12" font-weight="600">Passe-bas</text>
+          <line x1="20" y1="100" x2="170" y2="100" stroke="#8b949e" stroke-width="1"/>
+          <line x1="20" y1="30" x2="20" y2="110" stroke="#8b949e" stroke-width="1"/>
+          <polyline points="20,40 80,40 80,100 170,100" fill="none" stroke="#58d4e0" stroke-width="2.5"/>
+          <line x1="80" y1="40" x2="80" y2="110" stroke="#6e7681" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="80" y="118" text-anchor="middle" fill="#6e7681" font-size="9">fc</text>
+          <text x="22" y="45" fill="#58d4e0" font-size="9">0dB</text>
+          <!-- Passe-haut -->
+          <text x="285" y="20" text-anchor="middle" fill="#bc8cff" font-size="12" font-weight="600">Passe-haut</text>
+          <line x1="210" y1="100" x2="360" y2="100" stroke="#8b949e" stroke-width="1"/>
+          <line x1="210" y1="30" x2="210" y2="110" stroke="#8b949e" stroke-width="1"/>
+          <polyline points="210,100 270,100 270,40 360,40" fill="none" stroke="#bc8cff" stroke-width="2.5"/>
+          <line x1="270" y1="40" x2="270" y2="110" stroke="#6e7681" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="270" y="118" text-anchor="middle" fill="#6e7681" font-size="9">fc</text>
+          <!-- Passe-bande -->
+          <text x="475" y="20" text-anchor="middle" fill="#f0a93a" font-size="12" font-weight="600">Passe-bande</text>
+          <line x1="400" y1="100" x2="550" y2="100" stroke="#8b949e" stroke-width="1"/>
+          <line x1="400" y1="30" x2="400" y2="110" stroke="#8b949e" stroke-width="1"/>
+          <polyline points="400,100 430,100 430,40 510,40 510,100 550,100" fill="none" stroke="#f0a93a" stroke-width="2.5"/>
+          <line x1="430" y1="110" x2="510" y2="110" stroke="#f0a93a" stroke-width="1.5"/>
+          <text x="470" y="122" text-anchor="middle" fill="#f0a93a" font-size="9">BW</text>
+          <text x="430" y="118" text-anchor="middle" fill="#6e7681" font-size="8">f₁</text>
+          <text x="510" y="118" text-anchor="middle" fill="#6e7681" font-size="8">f₂</text>
+          <!-- Coupe-bande / Notch -->
+          <text x="665" y="20" text-anchor="middle" fill="#56d364" font-size="12" font-weight="600">Coupe-bande</text>
+          <line x1="590" y1="100" x2="740" y2="100" stroke="#8b949e" stroke-width="1"/>
+          <line x1="590" y1="30" x2="590" y2="110" stroke="#8b949e" stroke-width="1"/>
+          <polyline points="590,40 620,40 620,100 700,100 700,40 740,40" fill="none" stroke="#56d364" stroke-width="2.5"/>
+          <text x="620" y="118" text-anchor="middle" fill="#6e7681" font-size="8">f₁</text>
+          <text x="700" y="118" text-anchor="middle" fill="#6e7681" font-size="8">f₂</text>
+
+          <!-- Gabarit passe-bas (réel) -->
+          <text x="95" y="160" text-anchor="middle" fill="#8b949e" font-size="11">Gabarit (filtre réel)</text>
+          <line x1="20" y1="260" x2="170" y2="260" stroke="#8b949e" stroke-width="1"/>
+          <line x1="20" y1="175" x2="20" y2="268" stroke="#8b949e" stroke-width="1"/>
+          <!-- Bande passante zone -->
+          <rect x="20" y="175" width="75" height="45" fill="rgba(88,212,224,0.08)" stroke="#58d4e0" stroke-width="1" stroke-dasharray="4,2"/>
+          <!-- Bande de transition -->
+          <rect x="95" y="175" width="20" height="85" fill="rgba(240,169,58,0.06)" stroke="#f0a93a" stroke-width="1" stroke-dasharray="4,2"/>
+          <!-- Bande rejetée -->
+          <rect x="115" y="220" width="55" height="40" fill="rgba(248,81,73,0.06)" stroke="#f85149" stroke-width="1" stroke-dasharray="4,2"/>
+          <text x="57" y="202" text-anchor="middle" fill="#58d4e0" font-size="8">Gmax</text>
+          <text x="57" y="215" text-anchor="middle" fill="#58d4e0" font-size="8">Bande passante</text>
+          <text x="105" y="192" text-anchor="middle" fill="#f0a93a" font-size="8">Trans.</text>
+          <text x="143" y="248" text-anchor="middle" fill="#f85149" font-size="8">Rejet (Gmin)</text>
+          <!-- Courbe réelle -->
+          <path d="M 20,185 L 75,188 C 90,188 95,190 100,200 C 108,220 115,245 130,255 L 170,258" fill="none" stroke="#58d4e0" stroke-width="2"/>
+          <text x="95" y="278" text-anchor="middle" fill="#6e7681" font-size="9">Gabarit passe-bas idéal vs réel</text>
+        </svg>
+        <div class="diagram-caption">Figure 5 — Les 4 types de filtres (réponses idéales) + exemple de gabarit pour un filtre passe-bas réel</div>
+      </div>
+
+      <h3>II — Le Gabarit</h3>
+      <p>Un filtre parfait est irréalisable. Le <strong>gabarit</strong> définit les tolérances acceptables pour la réponse réelle.</p>
+      <div class="card card-formula">
+        <div class="card-label">Éléments d'un gabarit</div>
+        <ul style="margin:8px 0 0 18px; color:var(--text2); line-height:1.9; font-size:14px;">
+          <li><strong>Bande passante</strong> : plage où le gain doit être &gt; G_min (souvent −3 dB)</li>
+          <li><strong>Bande atténuée</strong> : plage où le gain doit être &lt; G_max_attenuation</li>
+          <li><strong>Bande de transition</strong> : zone entre bande passante et bande atténuée</li>
+          <li><strong>Fréquence de coupure fc</strong> : fréquence à −3 dB (gain = 1/√2 en linéaire)</li>
+        </ul>
+      </div>
+
+      <h3>III — Diagramme de Bode</h3>
+      <p>Représentation graphique du module (gain en dB) et de la phase en fonction de la <strong>fréquence (échelle logarithmique)</strong>.</p>
+
+      <div class="card card-key">
+        <div class="card-label">Pente du filtre RC (1er ordre)</div>
+        <div class="formula">• En dessous de fc : gain ≈ 0 dB
+• Au-dessus de fc : pente de −20 dB/décade
+• À fc : gain = −3 dB, phase = −45°</div>
+      </div>
+
+      <h3>IV — Filtre passe-bande RLC — Facteur de qualité</h3>
+      <div class="card card-formula">
+        <div class="card-label">Fréquence centrale & Facteur de qualité Q</div>
+        <div class="formula">ω₀ = 1/√(LC)       f₀ = 1/(2π√(LC))
+Q = (1/R)·√(L/C) = f₀ / BW₋₃dB
+<span class="comment"># BW = largeur de bande à −3 dB = f₀/Q</span></div>
+      </div>
+
+      <div class="card card-formula">
+        <div class="card-label">Fonction de transfert générale (passe-bande)</div>
+        <div class="formula">        j·(ω/Q·ω₀)
+T(ω) = ─────────────────────────────
+        1 + j·(ω/Q·ω₀) − (ω/ω₀)²
+<span class="comment"># À ω = ω₀ : |T| = 1 (0 dB), φ = 0°</span></div>
+      </div>
+
+      <div class="card card-tip">
+        <div class="card-label">💡 Sélectivité</div>
+        <p style="margin:0;"><strong>Q grand</strong> → filtre très sélectif (bande étroite). <strong>Q petit</strong> → filtre large bande. En pratique, Q = f₀/BW permet de vérifier directement si un filtre passe-bande répond à un cahier des charges.</p>
+      </div>
+    </div>
+
+    <div id="ch4-exos" class="tab-content">
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD5 · Ex1</span>
+          <span class="exercise-title">Tracé du diagramme de Bode — Filtre RIAA</span>
+          <span class="exercise-badge badge-td">TD n°5</span>
+        </div>
+        <div class="exercise-body">
+          <p>Mesures du filtre (Ve_cc = 4 V constante) :</p>
+          <table>
+            <tr><th>f (Hz)</th><th>Vs_cc (V)</th><th>A = Vs/Ve</th><th>G (dB)</th></tr>
+            <tr><td>30</td><td>3,44</td><td>0,86</td><td>?</td></tr>
+            <tr><td>100</td><td>1,86</td><td>0,465</td><td>?</td></tr>
+            <tr><td>300</td><td>0,78</td><td>0,195</td><td>?</td></tr>
+            <tr><td>1000</td><td>0,40</td><td>0,10</td><td>?</td></tr>
+            <tr><td>3000</td><td>0,23</td><td>0,0575</td><td>?</td></tr>
+            <tr><td>10000</td><td>0,074</td><td>0,0185</td><td>?</td></tr>
+            <tr><td>20000</td><td>0,054</td><td>0,0135</td><td>?</td></tr>
+          </table>
+          <div class="question"><strong>Q1</strong> Calculer le gain en dB pour chaque fréquence.</div>
+          <div class="question"><strong>Q2</strong> Gabarit RIAA : décrire et vérifier que les valeurs calculées respectent le gabarit.</div>
+          <div class="question"><strong>Q3</strong> Quel type de filtre est-ce ? (passe-bas, passe-haut, etc.)</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              G(dB) = 20·log(Vs/Ve) :
+              <table style="margin-top:8px;">
+                <tr><th>f (Hz)</th><th>G (dB)</th></tr>
+                <tr><td>30</td><td>20·log(0,86) ≈ <strong>−1,3 dB</strong></td></tr>
+                <tr><td>100</td><td>20·log(0,465) ≈ <strong>−6,6 dB</strong></td></tr>
+                <tr><td>300</td><td>20·log(0,195) ≈ <strong>−14,2 dB</strong></td></tr>
+                <tr><td>1000</td><td>20·log(0,10) = <strong>−20 dB</strong></td></tr>
+                <tr><td>3000</td><td>20·log(0,0575) ≈ <strong>−24,8 dB</strong></td></tr>
+                <tr><td>10000</td><td>20·log(0,0185) ≈ <strong>−34,7 dB</strong></td></tr>
+                <tr><td>20000</td><td>20·log(0,0135) ≈ <strong>−37,4 dB</strong></td></tr>
+              </table>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              Gabarit RIAA : G &lt; 0 dB pour f &lt; 500 Hz, G &lt; −15 dB pour 500 Hz–10 kHz, G &lt; −30 dB pour f &gt; 10 kHz.<br>
+              Vérification : à 30 Hz → −1,3 dB ✓ (≤ 0 dB) ; à 1000 Hz → −20 dB ✓ (≤ −15 dB) ; à 10 kHz → −34,7 dB ✓ (≤ −30 dB)
+              <div class="result">Le filtre respecte le gabarit RIAA ✓</div>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              Le gain diminue quand la fréquence augmente → c'est un <strong>filtre passe-bas</strong>. C'est le filtre de lecture vinyle (inverse du filtre d'enregistrement).
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD5 · Ex2</span>
+          <span class="exercise-title">Filtre RC — Bode et filtrage d'un signal carré</span>
+          <span class="exercise-badge badge-td">TD n°5</span>
+        </div>
+        <div class="exercise-body">
+          <p>Filtre RC. Mesure à 150 kHz : Ve_cc = 1 V, Vs_cc = 0,44 V. Déphasage relevé : 63°. Fréquence de coupure relevée sur Bode : <strong>fc ≈ 100 kHz</strong>.</p>
+          <p>On applique en entrée un signal carré <strong>± 5 V, 100 kHz</strong>.</p>
+          <div class="question"><strong>Q1</strong> Calculer le gain en dB à 150 kHz.</div>
+          <div class="question"><strong>Q2</strong> Donner les amplitudes des 5 premiers harmoniques du signal carré d'entrée (en V crête et dBV).</div>
+          <div class="question"><strong>Q3</strong> Le filtre a G(100 kHz) = −3 dB, G(300 kHz) ≈ −10 dB, G(500 kHz) ≈ −14 dB. Calculer la hauteur de chaque raie en sortie.</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              G = 20·log(0,44/1) = 20·log(0,44) = 20×(−0,357)
+              <div class="result">G(150 kHz) ≈ −7,1 dB</div>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              Signal carré ±5V sym. → pas de composante continue, harmoniques impairs :<br>
+              C₁ = 4×5/π ≈ 6,37 V à 100 kHz → 20·log(6,37/1,41) = 20·log(4,51) ≈ <strong>13,1 dBV</strong> (dBV_eff)<br>
+              C₃ = 4×5/(3π) ≈ 2,12 V à 300 kHz → ≈ <strong>3,5 dBV_eff</strong><br>
+              C₅ = 4×5/(5π) ≈ 1,27 V à 500 kHz → ≈ <strong>−0,9 dBV_eff</strong>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              Sortie = Entrée(dBV) + G_filtre(dB) :<br>
+              f₁ = 100 kHz : 13,1 + (−3) = <strong>10,1 dBV</strong><br>
+              f₃ = 300 kHz : 3,5 + (−10) = <strong>−6,5 dBV</strong><br>
+              f₅ = 500 kHz : −0,9 + (−14) = <strong>−14,9 dBV</strong><br>
+              → Le filtre passe-bas atténue fortement les harmoniques élevés → le signal de sortie ressemble de plus en plus à une sinusoïde.
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD6 · Ex2</span>
+          <span class="exercise-title">Filtre passe-bande RLC — Facteur de qualité</span>
+          <span class="exercise-badge badge-td">TD n°6</span>
+        </div>
+        <div class="exercise-body">
+          <p>Filtre passe-bande RLC pour sélectionner <strong>455 kHz</strong> (fréquence intermédiaire radio).</p>
+          <p>Valeurs : <strong>C = 1 nF</strong>, <strong>L = 122 µH</strong>, <strong>R = 564 Ω</strong>.</p>
+          <div class="question"><strong>Q1</strong> Calculer ω₀, f₀ et Q.</div>
+          <div class="question"><strong>Q2</strong> Valeur de T(ω) et du gain à ω = ω₀.</div>
+          <div class="question"><strong>Q3</strong> Cahier des charges : BW₋₃dB ≈ 300 kHz. Le filtre est-il conforme ?</div>
+          <div class="question"><strong>Q4</strong> Valeur de Q nécessaire pour une BW = 300 kHz. Quelle valeur de R ?</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              ω₀ = 1/√(LC) = 1/√(122×10⁻⁶ × 10⁻⁹) = 1/√(1,22×10⁻¹³) = 1/(1,105×10⁻⁶·…)<br>
+              ω₀ = 1/√(1,22×10⁻¹³) ≈ 2,86×10⁶ rad/s<br>
+              f₀ = ω₀/(2π) ≈ 2,86×10⁶ / 6,28 ≈ <strong>455 kHz ✓</strong><br>
+              Q = (1/R)·√(L/C) = (1/564)·√(122×10⁻⁶/10⁻⁹) = (1/564)·√(122×10³) = (1/564)·349,3
+              <div class="result">Q ≈ 0,62</div>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              À ω = ω₀ : T(ω₀) = 1 (le terme imaginaire se simplifie)<br>
+              <div class="result">|T(ω₀)| = 1 → G = 0 dB, φ = 0°</div>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              BW = f₀/Q = 455 kHz / 0,62 ≈ 734 kHz → <strong>non conforme</strong> au cahier des charges de 300 kHz !
+            </div></div>
+            <div class="step"><span class="step-num">4</span><div class="step-body">
+              Q_requis = f₀/BW = 455/300 ≈ <strong>1,52</strong><br>
+              Q = (1/R)·√(L/C) = 1,52 → R = √(L/C) / 1,52 = 349,3 / 1,52
+              <div class="result">R ≈ 230 Ω (au lieu de 564 Ω)</div>
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">TD6 · Ex1</span>
+          <span class="exercise-title">Filtrage GSM 1800 MHz — Application sur signal réel</span>
+          <span class="exercise-badge badge-td">TD n°6</span>
+        </div>
+        <div class="exercise-body">
+          <p>Filtre intégré de téléphone portable sélectionnant la bande GSM 1800 MHz descendante (<strong>1805–1880 MHz</strong>). Caractéristiques du filtre :</p>
+          <ul style="margin:10px 0 10px 20px; color:var(--text2); line-height:1.8; font-size:14px;">
+            <li>Type : passe-bande</li>
+            <li>Fréquence centrale : 1842,5 MHz</li>
+            <li>Bande passante à −3 dB : 75 MHz</li>
+            <li>Perte d'insertion : 2 dB (G = −2 dB dans la bande passante)</li>
+          </ul>
+          <p>Le téléphone reçoit une communication à <strong>f₁ = 1850 MHz</strong>, <strong>P₁ = −65 dBm</strong>. Un parasite est émis par un 2e téléphone à <strong>f₂ = 1755 MHz</strong> (bande montante), <strong>P₂ = −58 dBm</strong>.</p>
+          <div class="question"><strong>Q1</strong> Puissance du signal utile en sortie du filtre.</div>
+          <div class="question"><strong>Q2</strong> Le filtre attenue-t-il le parasite ? Expliquer.</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              f₁ = 1850 MHz est dans la bande passante (1805–1880 MHz) → seule la perte d'insertion s'applique.<br>
+              P_sortie = P₁ + G = −65 + (−2) = <div class="result">P_sortie = −67 dBm</div>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              f₂ = 1755 MHz est dans la bande montante (1710–1785 MHz), hors de la bande passante du filtre.<br>
+              L'atténuation dans la bande rejetée est très forte (typiquement &gt; 20 dB pour ce type de filtre).<br>
+              Le parasite est fortement atténué → <strong>le filtre remplit son rôle de sélection</strong> ✓
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-header" onclick="toggleExo(this)">
+          <span class="exercise-num">BONUS</span>
+          <span class="exercise-title">Exercice inventé — Gabarit et vérification de conformité</span>
+          <span class="exercise-badge badge-bonus">Bonus</span>
+        </div>
+        <div class="exercise-body">
+          <p>Un filtre passe-bas doit respecter le gabarit suivant :</p>
+          <ul style="margin:10px 0 10px 20px; color:var(--text2); line-height:1.8; font-size:14px;">
+            <li>Bande passante (f &lt; 1 kHz) : G ≥ −1 dB</li>
+            <li>Bande de transition (1 kHz – 5 kHz) : pas de contrainte</li>
+            <li>Bande atténuée (f &gt; 5 kHz) : G ≤ −20 dB</li>
+          </ul>
+          <p>Mesures obtenues : G(500 Hz) = −0,5 dB, G(1 kHz) = −1 dB, G(5 kHz) = −22 dB, G(10 kHz) = −31 dB.</p>
+          <div class="question"><strong>Q1</strong> Le filtre respecte-t-il le gabarit ? Justifier pour chaque zone.</div>
+          <div class="question"><strong>Q2</strong> Quelle est la fréquence de coupure à −3 dB approximative ? (On relève G = −3 dB à f ≈ 1,5 kHz sur les mesures.)</div>
+          <div class="question"><strong>Q3</strong> Calculer le facteur de qualité si ce filtre était un passe-bande de f₀ = 3 kHz et BW₋₃dB = 1,5 kHz.</div>
+          <button class="correction-toggle" onclick="toggleCorrection(this)">▶ Voir la correction</button>
+          <div class="correction-panel">
+            <h5>✔ Correction</h5>
+            <div class="step"><span class="step-num">1</span><div class="step-body">
+              • Bande passante : G(500 Hz) = −0,5 dB ≥ −1 dB ✓ ; G(1 kHz) = −1 dB ≥ −1 dB ✓<br>
+              • Bande atténuée : G(5 kHz) = −22 dB ≤ −20 dB ✓ ; G(10 kHz) = −31 dB ✓
+              <div class="result">Filtre conforme au gabarit ✓</div>
+            </div></div>
+            <div class="step"><span class="step-num">2</span><div class="step-body">
+              La fréquence de coupure à −3 dB se définit comme la fréquence pour laquelle G = −3 dB.
+              <div class="result">fc ≈ 1,5 kHz (lu sur les mesures)</div>
+            </div></div>
+            <div class="step"><span class="step-num">3</span><div class="step-body">
+              Q = f₀ / BW₋₃dB = 3000 / 1500 = <div class="result">Q = 2</div>
+              Un facteur Q = 2 correspond à un filtre modérément sélectif.
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.chapter-page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const page = document.getElementById('page-' + id);
+  if (page) {
+    page.classList.add('active');
+    page.style.display = 'block';
+  }
+
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes("'" + id + "'")) {
+      item.classList.add('active');
+    }
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchTab(btn, chapter, tab) {
+  const wrap = btn.closest('.chapter-page').querySelector('.content-wrap');
+  wrap.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  btn.closest('.tab-switcher').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+  const tc = document.getElementById(chapter + '-' + tab);
+  if (tc) tc.classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleExo(header) {
+  const body = header.nextElementSibling;
+  if (body) {
+    const isOpen = body.style.display === 'block';
+    body.style.display = isOpen ? 'none' : 'block';
+  }
+}
+
+function toggleCorrection(btn) {
+  const panel = btn.nextElementSibling;
+  if (panel) {
+    panel.classList.toggle('open');
+    btn.classList.toggle('open');
+    btn.textContent = panel.classList.contains('open') ? '▼ Masquer la correction' : '▶ Voir la correction';
+  }
+}
+
+// Init: fermer tous les exercices
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.exercise-body').forEach(b => {
+    b.style.display = 'none';
+  });
+  // Ouvrir la page home
+  document.querySelectorAll('.chapter-page').forEach(p => {
+    if (!p.classList.contains('active')) p.style.display = 'none';
+  });
+});
+</script>
+</body>
+</html>
